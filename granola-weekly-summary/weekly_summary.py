@@ -164,19 +164,27 @@ def extract_takeaways_and_todos(note: dict) -> str:
 
 # --- Email ---
 
+def _strip_leading_zero(s: str) -> str:
+    """Remove leading zeros from day/hour numbers for cleaner date display."""
+    return s.replace(" 0", " ").replace(":0", ":0")  # keep :00 but fix " 01" → " 1"
+
+
 def _format_meeting_date(meeting_date: str) -> str:
     if not meeting_date:
         return ""
     try:
         dt = datetime.fromisoformat(meeting_date.replace("Z", "+00:00"))
-        return dt.strftime("%A, %b %-d at %-I:%M %p")
+        return _strip_leading_zero(dt.strftime("%A, %b %d at %I:%M %p"))
     except ValueError:
         return meeting_date
 
 
 def build_email_html(week_start: datetime, week_end: datetime, processed_notes: list[dict]) -> str:
     """Build a clean HTML email with all meeting summaries."""
-    week_range = f"{week_start.strftime('%b %-d')} – {week_end.strftime('%b %-d, %Y')}"
+    week_range = (
+        f"{_strip_leading_zero(week_start.strftime('%b %d'))} – "
+        f"{_strip_leading_zero(week_end.strftime('%b %d, %Y'))}"
+    )
     count = len(processed_notes)
 
     meetings_html = ""
@@ -300,7 +308,8 @@ def main() -> None:
     html = build_email_html(week_start, week_end, processed_notes)
     subject = (
         f"📋 Weekly Call Summary — "
-        f"{week_start.strftime('%b %-d')} to {week_end.strftime('%b %-d, %Y')} "
+        f"{_strip_leading_zero(week_start.strftime('%b %d'))} to "
+        f"{_strip_leading_zero(week_end.strftime('%b %d, %Y'))} "
         f"({len(processed_notes)} meeting{'s' if len(processed_notes) != 1 else ''})"
     )
 
