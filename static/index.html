@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zenoti Data Warehouse &amp; Analysis</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <h1>Zenoti Analytics</h1>
+      <div class="sync-controls">
+        <input type="date" id="start-date" />
+        <input type="date" id="end-date" />
+        <button id="sync-btn" onclick="triggerSync()">Sync Data</button>
+        <span id="sync-badge" class="badge hidden"></span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- KPI Row -->
+    <section class="kpi-row" id="kpi-row">
+      <div class="kpi-card" id="kpi-revenue">
+        <div class="kpi-label">Net Revenue</div>
+        <div class="kpi-value" id="v-revenue">—</div>
+      </div>
+      <div class="kpi-card" id="kpi-discount">
+        <div class="kpi-label">Total Discounts</div>
+        <div class="kpi-value" id="v-discount">—</div>
+      </div>
+      <div class="kpi-card" id="kpi-rate">
+        <div class="kpi-label">Discount Rate</div>
+        <div class="kpi-value" id="v-rate">—</div>
+      </div>
+      <div class="kpi-card" id="kpi-invoices">
+        <div class="kpi-label">Invoices</div>
+        <div class="kpi-value" id="v-invoices">—</div>
+      </div>
+      <div class="kpi-card" id="kpi-guests">
+        <div class="kpi-label">Guests</div>
+        <div class="kpi-value" id="v-guests">—</div>
+      </div>
+    </section>
+
+    <!-- Charts row -->
+    <section class="charts-row">
+      <div class="chart-card wide">
+        <div class="chart-header">
+          <h2>Revenue Over Time</h2>
+          <select id="period-select" onchange="loadRevenue()">
+            <option value="month">Monthly</option>
+            <option value="week">Weekly</option>
+            <option value="day">Daily</option>
+          </select>
+        </div>
+        <canvas id="revenue-chart"></canvas>
+      </div>
+      <div class="chart-card">
+        <h2>Booking Trends by Day</h2>
+        <canvas id="booking-chart"></canvas>
+      </div>
+    </section>
+
+    <!-- Tables row -->
+    <section class="tables-row">
+      <div class="table-card">
+        <h2>Top Services by Revenue</h2>
+        <div id="services-table"></div>
+      </div>
+      <div class="table-card">
+        <h2>Therapist Utilization</h2>
+        <div id="employee-table"></div>
+      </div>
+    </section>
+
+    <!-- Guest retention -->
+    <section class="charts-row">
+      <div class="chart-card">
+        <h2>Guest Retention</h2>
+        <canvas id="retention-chart"></canvas>
+        <div id="retention-stats" class="retention-stats"></div>
+      </div>
+      <div class="chart-card wide">
+        <h2>Cost Savings Breakdown</h2>
+        <canvas id="savings-chart"></canvas>
+      </div>
+    </section>
+
+    <!-- Sync log -->
+    <section class="table-card full-width">
+      <h2>Sync History</h2>
+      <div id="sync-log"></div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
