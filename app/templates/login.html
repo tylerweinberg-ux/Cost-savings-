@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Sign in — Recruiting ATS{% endblock %}
+{% block content %}
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="login-logo">🦷</div>
+    <h1>Oral Surgeon Recruiting</h1>
+    <p class="muted">Sign in to your team workspace</p>
+    <form method="post" action="{{ url_for('auth.login') }}">
+      <label>Email
+        <input type="email" name="email" required autofocus value="tyler@recruiting.example" />
+      </label>
+      <label>Password
+        <input type="password" name="password" required value="demo1234" />
+      </label>
+      <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+    </form>
+    <div class="login-hint">
+      <strong>Demo team accounts</strong> (password <code>demo1234</code>):<br />
+      tyler@recruiting.example · dana@recruiting.example · marcus@recruiting.example
+    </div>
+  </div>
+</div>
+{% endblock %}

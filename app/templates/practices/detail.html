@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ practice.name }} — Recruiting ATS{% endblock %}
+{% block content %}
+<a href="{{ url_for('practices.list_practices') }}" class="back-link">← Back to practices</a>
+
+<h1 class="page-title">{{ practice.name }}</h1>
+<p class="muted">{{ practice.location }} · {{ practice.region }} region</p>
+
+<section class="kpi-grid">
+  <div class="kpi"><div class="kpi-value">{{ practice.open_roles }}</div><div class="kpi-label">Open roles</div></div>
+  <div class="kpi"><div class="kpi-value">{{ practice.num_providers }}</div><div class="kpi-label">Current providers</div></div>
+  <div class="kpi kpi-accent"><div class="kpi-value">{{ active_count }}</div><div class="kpi-label">Active candidates</div></div>
+  <div class="kpi"><div class="kpi-value">{{ candidates|length }}</div><div class="kpi-label">Total linked</div></div>
+</section>
+
+{% if practice.notes %}
+<section class="card"><h2>Notes</h2><p>{{ practice.notes }}</p></section>
+{% endif %}
+
+<section class="card">
+  <h2>Linked candidates</h2>
+  <table class="data-table">
+    <thead>
+      <tr><th>Candidate</th><th>Stage</th><th>Exp.</th><th>Owner</th><th>Rating</th></tr>
+    </thead>
+    <tbody>
+      {% for c in candidates %}
+      <tr onclick="window.location='{{ url_for('candidates.detail', candidate_id=c.id) }}'">
+        <td class="cand-name">{{ c.full_name }}</td>
+        <td><span class="badge stage-{{ c.stage|lower }}">{{ c.stage }}</span></td>
+        <td>{{ c.years_experience }}y</td>
+        <td>{{ c.owner.name if c.owner else '—' }}</td>
+        <td><span class="stars">{{ '★' * c.rating }}{{ '☆' * (5 - c.rating) }}</span></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="muted">No candidates linked to this practice yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

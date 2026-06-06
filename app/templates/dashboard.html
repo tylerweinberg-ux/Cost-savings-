@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Recruiting ATS{% endblock %}
+{% block content %}
+<h1 class="page-title">Pipeline Dashboard</h1>
+<p class="muted">Oral surgeon recruiting — live pipeline health and conversion.</p>
+
+<section class="kpi-grid">
+  <div class="kpi">
+    <div class="kpi-value">{{ kpis.total }}</div>
+    <div class="kpi-label">Total candidates</div>
+  </div>
+  <div class="kpi kpi-accent">
+    <div class="kpi-value">{{ kpis.active }}</div>
+    <div class="kpi-label">Active in pipeline</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-value">{{ kpis.hired }}</div>
+    <div class="kpi-label">Hired</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-value">{{ kpis.overall_conversion }}%</div>
+    <div class="kpi-label">Sourced → Hired rate</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-value">{{ kpis.offer_accept }}%</div>
+    <div class="kpi-label">Offer acceptance</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-value">{{ kpis.open_practices }}</div>
+    <div class="kpi-label">Practices</div>
+  </div>
+</section>
+
+<div class="grid-2">
+  <section class="card">
+    <h2>Conversion funnel</h2>
+    <table class="funnel-table">
+      <thead>
+        <tr><th>Stage</th><th>Reached</th><th>Step conversion</th></tr>
+      </thead>
+      <tbody>
+        {% for f in funnel %}
+        <tr>
+          <td>{{ f.stage }}</td>
+          <td><strong>{{ f.count }}</strong></td>
+          <td>
+            <div class="bar-wrap">
+              <div class="bar" style="width: {{ f.conversion }}%"></div>
+              <span>{{ f.conversion }}%</span>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>Candidates by stage</h2>
+    <canvas id="stageChart" height="240"></canvas>
+  </section>
+</div>
+
+<section class="card">
+  <h2>Recently active candidates</h2>
+  <table class="data-table">
+    <thead>
+      <tr><th>Candidate</th><th>Stage</th><th>Practice</th><th>Owner</th><th>Last activity</th></tr>
+    </thead>
+    <tbody>
+      {% for c in recent %}
+      <tr onclick="window.location='{{ url_for('candidates.detail', candidate_id=c.id) }}'">
+        <td>{{ c.full_name }}</td>
+        <td><span class="badge stage-{{ c.stage|lower }}">{{ c.stage }}</span></td>
+        <td>{{ c.practice.name if c.practice else '—' }}</td>
+        <td>{{ c.owner.name if c.owner else '—' }}</td>
+        <td>{{ c.last_activity.strftime('%b %d, %Y') }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="muted">No active candidates.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  const stageData = {{ stage_breakdown|tojson }};
+  new Chart(document.getElementById('stageChart'), {
+    type: 'bar',
+    data: {
+      labels: stageData.map(d => d.stage),
+      datasets: [{
+        label: 'Candidates',
+        data: stageData.map(d => d.count),
+        backgroundColor: '#2563eb',
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+    }
+  });
+</script>
+{% endblock %}

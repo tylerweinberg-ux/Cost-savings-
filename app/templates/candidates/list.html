@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Candidates — Recruiting ATS{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Candidates</h1>
+    <p class="muted">{{ candidates|length }} of {{ total }} candidates shown</p>
+  </div>
+</div>
+
+<form class="filters" method="get" action="{{ url_for('candidates.list_candidates') }}">
+  <input type="search" name="q" placeholder="Search name, email, location…" value="{{ filters.q }}" />
+  <select name="stage">
+    <option value="">All stages</option>
+    {% for s in stages %}
+      <option value="{{ s }}" {{ 'selected' if filters.stage == s }}>{{ s }}</option>
+    {% endfor %}
+  </select>
+  <select name="practice">
+    <option value="">All practices</option>
+    {% for p in practices %}
+      <option value="{{ p.id }}" {{ 'selected' if filters.practice == p.id|string }}>{{ p.name }}</option>
+    {% endfor %}
+  </select>
+  <label class="checkbox">
+    <input type="checkbox" name="active" value="1" {{ 'checked' if filters.active }} /> Active only
+  </label>
+  <button type="submit" class="btn btn-primary">Filter</button>
+  <a href="{{ url_for('candidates.list_candidates') }}" class="btn btn-ghost">Reset</a>
+</form>
+
+<table class="data-table">
+  <thead>
+    <tr>
+      <th>Candidate</th><th>Stage</th><th>Exp.</th><th>Practice</th>
+      <th>Owner</th><th>Rating</th><th>Last activity</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for c in candidates %}
+    <tr onclick="window.location='{{ url_for('candidates.detail', candidate_id=c.id) }}'">
+      <td>
+        <div class="cand-cell">
+          <span class="avatar">{{ c.initials }}</span>
+          <div>
+            <div class="cand-name">{{ c.full_name }}</div>
+            <div class="muted small">{{ c.current_location }}</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="badge stage-{{ c.stage|lower }}">{{ c.stage }}</span></td>
+      <td>{{ c.years_experience }}y</td>
+      <td>{{ c.practice.name if c.practice else '—' }}</td>
+      <td>{{ c.owner.name if c.owner else '—' }}</td>
+      <td><span class="stars">{{ '★' * c.rating }}{{ '☆' * (5 - c.rating) }}</span></td>
+      <td class="muted small">{{ c.last_activity.strftime('%b %d, %Y') }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7" class="muted">No candidates match these filters.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

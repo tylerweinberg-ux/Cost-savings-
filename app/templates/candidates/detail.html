@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}{{ candidate.full_name }} — Recruiting ATS{% endblock %}
+{% block content %}
+<a href="{{ url_for('candidates.list_candidates') }}" class="back-link">← Back to candidates</a>
+
+<div class="profile-head">
+  <span class="avatar avatar-lg">{{ candidate.initials }}</span>
+  <div>
+    <h1 class="page-title">{{ candidate.full_name }}</h1>
+    <p class="muted">{{ candidate.specialty }} · {{ candidate.years_experience }} yrs experience</p>
+  </div>
+  <span class="badge stage-{{ candidate.stage|lower }} badge-lg">{{ candidate.stage }}</span>
+</div>
+
+<div class="grid-2">
+  <div>
+    <section class="card">
+      <h2>Profile</h2>
+      <dl class="detail-list">
+        <dt>Email</dt><dd>{{ candidate.email }}</dd>
+        <dt>Phone</dt><dd>{{ candidate.phone }}</dd>
+        <dt>Location</dt><dd>{{ candidate.current_location }}</dd>
+        <dt>Dental school</dt><dd>{{ candidate.dental_school }}</dd>
+        <dt>Grad year</dt><dd>{{ candidate.grad_year }}</dd>
+        <dt>Source</dt><dd>{{ candidate.source }}</dd>
+        <dt>Expected comp</dt><dd>${{ "{:,.0f}".format(candidate.expected_comp) if candidate.expected_comp else '—' }}</dd>
+        <dt>Rating</dt><dd><span class="stars">{{ '★' * candidate.rating }}{{ '☆' * (5 - candidate.rating) }}</span></dd>
+        <dt>Linked practice</dt>
+        <dd>
+          {% if candidate.practice %}
+            <a href="{{ url_for('practices.detail', practice_id=candidate.practice.id) }}">{{ candidate.practice.name }}</a>
+          {% else %}— not linked —{% endif %}
+        </dd>
+        <dt>Owner</dt><dd>{{ candidate.owner.name if candidate.owner else '—' }}</dd>
+      </dl>
+    </section>
+
+    <section class="card">
+      <h2>Manage</h2>
+      <form method="post" action="{{ url_for('candidates.update', candidate_id=candidate.id) }}" class="stacked-form">
+        <label>Pipeline stage
+          <select name="stage">
+            {% for s in stages %}
+              <option value="{{ s }}" {{ 'selected' if candidate.stage == s }}>{{ s }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>Link to practice
+          <select name="practice_id">
+            <option value="">— none —</option>
+            {% for p in practices %}
+              <option value="{{ p.id }}" {{ 'selected' if candidate.practice_id == p.id }}>{{ p.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>Owner
+          <select name="owner_id">
+            <option value="">— unassigned —</option>
+            {% for u in team %}
+              <option value="{{ u.id }}" {{ 'selected' if candidate.owner_id == u.id }}>{{ u.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>Rating
+          <select name="rating">
+            {% for r in range(1, 6) %}
+              <option value="{{ r }}" {{ 'selected' if candidate.rating == r }}>{{ r }} ★</option>
+            {% endfor %}
+          </select>
+        </label>
+        <button type="submit" class="btn btn-primary">Save changes</button>
+      </form>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>Notes <span class="count">{{ candidate.notes|length }}</span></h2>
+    <form method="post" action="{{ url_for('candidates.add_note', candidate_id=candidate.id) }}" class="note-form">
+      <textarea name="body" rows="3" placeholder="Add a note for the team…" required></textarea>
+      <button type="submit" class="btn btn-primary">Add note</button>
+    </form>
+    <ul class="notes">
+      {% for note in candidate.notes %}
+      <li class="note">
+        <div class="note-meta">
+          <strong>{{ note.author.name if note.author else 'Unknown' }}</strong>
+          <span class="muted small">{{ note.created_at.strftime('%b %d, %Y · %I:%M %p') }}</span>
+        </div>
+        <div class="note-body">{{ note.body }}</div>
+      </li>
+      {% else %}
+      <li class="muted">No notes yet. Be the first to add one.</li>
+      {% endfor %}
+    </ul>
+  </section>
+</div>
+{% endblock %}

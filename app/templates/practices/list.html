@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Practices — Recruiting ATS{% endblock %}
+{% block content %}
+<h1 class="page-title">Practices</h1>
+<p class="muted">Practices candidates can be linked to and placed at.</p>
+
+<table class="data-table">
+  <thead>
+    <tr>
+      <th>Practice</th><th>Location</th><th>Region</th><th>Open roles</th>
+      <th>Linked</th><th>Active</th><th>Hired</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in summary %}
+    <tr onclick="window.location='{{ url_for('practices.detail', practice_id=row.practice.id) }}'">
+      <td class="cand-name">{{ row.practice.name }}</td>
+      <td>{{ row.practice.location }}</td>
+      <td>{{ row.practice.region }}</td>
+      <td>{{ row.practice.open_roles }}</td>
+      <td>{{ row.linked }}</td>
+      <td><strong>{{ row.active }}</strong></td>
+      <td>{{ row.hired }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
